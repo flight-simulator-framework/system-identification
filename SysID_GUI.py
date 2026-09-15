@@ -375,9 +375,11 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.max_horizontal_current_spinbox.setSingleStep(0.01)
         self.max_vertical_current_spinbox.setValue(max_curr_v)
         self.max_vertical_current_spinbox.setSingleStep(0.01)
-        self.horizontal_excursion_spinbox.setValue(0.5)
+        units_settings, sysid_kick, bpm_unit, corrs_unit=self._get_interface_units()
+        default_excursion = units_settings.get("sysid_target_excursion", 0.5)
+        self.horizontal_excursion_spinbox.setValue(default_excursion)
         self.horizontal_excursion_spinbox.setSingleStep(0.1)
-        self.vertical_excursion_spinbox.setValue(0.5)
+        self.vertical_excursion_spinbox.setValue(default_excursion)
         self.vertical_excursion_spinbox.setSingleStep(0.1)
         self._setup_nsamples_control()
         self._setup_beam_change_controls()
@@ -388,7 +390,6 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.modes_to_do=[]
         self.counter=0
         self.current_mode=None
-        units_settings, sysid_kick, bpm_unit, corrs_unit=self._get_interface_units()
         self.sysid_kick=sysid_kick
         self.bpm_unit=bpm_unit
         self.corrs_unit=corrs_unit
@@ -646,7 +647,6 @@ class MainWindow(QMainWindow, SaveOrLoad):
                 f"Not every corrector was set back at its saved current before the {mode.name} measurement. Check the correctors on the machine.")
 
         if mode==Mode.Orbit:
-            self.interface.reset_energy()
             #self.interface.reset_intensity()
             print("Nominal beam state confirmed for Orbit mode")
         elif mode==Mode.Dispersion:
