@@ -1,6 +1,7 @@
+import system_identification
 from datetime import datetime
 import numpy as np
-from Backend.SaveOrLoad import SaveOrLoad
+from machine_interfaces.Backend.SaveOrLoad import SaveOrLoad
 import time, sys, os, matplotlib, fnmatch, re
 try:
     from PyQt6 import uic
@@ -20,8 +21,8 @@ from enum import Enum
 matplotlib.use('QtAgg')
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from Interfaces.interface_setup import INTERFACE_SETUP
-from Backend.ActuatorMode import ActuatorMode
+from machine_interfaces.Interfaces.interface_setup import INTERFACE_SETUP
+from machine_interfaces.Backend.ActuatorMode import ActuatorMode
 
 class PlotPopup(QMainWindow):
     def __init__(self, title="SysID", parent=None):
@@ -336,7 +337,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
             max_curr_v = 1.15 * np.max(np.abs(clean_array(np.array(correctors['bdes'][vcorr_indexes]))))
 
         # Load the interface
-        uic.loadUi("UI files/SysID_GUI.ui", self)
+        uic.loadUi(os.path.join(os.path.dirname(system_identification.__file__), "UI files", "SysID_GUI.ui"), self)
         self._load_logo()
         # Replace the placeholder with your real widget
         self.right_layout.removeWidget(self.plot_widget)
@@ -535,7 +536,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
             else Qt.SmoothTransformation
         )
 
-        base_dir = os.path.dirname(os.path.abspath(__file__))
+        base_dir = os.path.dirname(system_identification.__file__)
         logo_path = os.path.join(base_dir, "UI files", "Assets", "CERN_logo.png")
 
         if not os.path.isfile(logo_path):
@@ -1022,8 +1023,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
 
 def main():
     app = QApplication(sys.argv)
-    from Backend import SelectInterface
-
+    from machine_interfaces.Backend import SelectInterface
     interface = SelectInterface.choose_acc_and_interface()
     if interface is None:
         return 1

@@ -18,7 +18,7 @@ from SysID_GUI import (
     finite_abs_max,
     update_amplitude,
 )
-from Backend.ActuatorMode import ActuatorMode
+from machine_interfaces.Backend.ActuatorMode import ActuatorMode
 
 
 class QMWorker(CorrectorWorker):
@@ -107,7 +107,7 @@ class QMWorker(CorrectorWorker):
                     err_y = np.sqrt(np.square(orbit_plus["stdy"]) + np.square(orbit_minus["stdy"])) / np.sqrt(nsamples)
 
                     if measured:
-                        self.plot_data.emit(orbit_plus, diff_x, err_x, diff_y, err_y, self.bpms, f"{magnet}:{axis}")
+                        self.plot_data.emit(diff_x, err_x, diff_y, err_y, self.bpms, f"{magnet}:{axis}")
                         self.progress_value += 1
                         self.progress.emit(int(self.progress_value / total_steps * 100))
 
@@ -153,7 +153,7 @@ class QMWorker(CorrectorWorker):
             interface.apply_qmag_xyroll(magnet, x0 + displacement, y0, roll0)
         else:
             interface.apply_qmag_xyroll(magnet, x0, y0 + displacement, roll0)
-        state = interface.get_state(include_screens=False)
+        state = interface.get_state()
         state.save(filename=filename)
         return state, True
 
@@ -205,8 +205,6 @@ class MainWindow(CorrectorSysIDWindow):
         self.excursion_label.setText(f"Target orbit excursion ({self.bpm_unit})")
         self.choose_mode.setCurrentText("Orbit Correction")
         self.choose_mode.setEnabled(False)
-        self.select_h_corrs_checkbox.setEnabled(False)
-        self.select_v_corrs_checkbox.setEnabled(False)
 
     def _validate_start(self):
         if not hasattr(self.interface, "apply_qmag_xyroll") or not hasattr(self.interface, "get_quadrupoles"):
@@ -237,7 +235,7 @@ class MainWindow(CorrectorSysIDWindow):
 
 def main():
     app = QApplication(sys.argv)
-    from Backend import SelectInterface
+    from machine_interfaces.Backend import SelectInterface
 
     interface = SelectInterface.choose_acc_and_interface()
     if interface is None:

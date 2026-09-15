@@ -27,12 +27,26 @@ Monitor the response plots during acquisition. Paired positive/negative measurem
 
 The separate `random_excitation/SysID_rnd.py` script provides an experimental random-excitation version of the application.
 
-## Installation
+## Installation and startup
 
-Use Python 3.11 or newer and Poetry 2 or newer. From the repository directory, install the dependencies:
+Use Python 3.11 or newer and Poetry 2 or newer. For this local development setup, keep `system-identification` and `machine-interfaces` next to each other:
+
+```text
+flight-simulator-repositories/
+    machine-interfaces/
+    system-identification/
+```
+
+From `system-identification`, run:
 
 ```bash
 poetry install
+poetry run python SysID_GUI.py
 ```
 
-Shared code is provided by `machine-interfaces`.
+For quadrupole-mover measurements:
+
+```bash
+poetry run python SysID_QM_GUI.py
+```
+
