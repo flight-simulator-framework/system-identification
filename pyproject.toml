@@ -9,7 +9,7 @@ dependencies = [
     "numpy>=2.4.2,<3",
     "matplotlib>=3.10.8,<4",
     "PyQt6>=6.10.2,<7",
-    "machine-interfaces[epics,madx,rftrack,tao]>=0.1.0,<0.2.0"
+    "machine-interfaces[epics,madx,rftrack,tao] @ git+https://gitlab.cern.ch/flight-simulator/machine-interfaces.git@54490bf072d3db26d98383eeeced1a759e1d4bbb"
 ]
 
 [build-system]
@@ -19,8 +19,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 packages = [{include = "system_identification"}, {include = "SysID_GUI.py"}, {include = "SysID_QM_GUI.py"}]
 
-[tool.poetry.dependencies]
-machine-interfaces = {path = "../machine-interfaces", develop = true, extras = ["epics", "madx", "rftrack", "tao"]}
 [tool.flight-simulator.migration]
 status = "sysid-local-execution-ready"
 repository-dependencies = ["machine-interfaces"]

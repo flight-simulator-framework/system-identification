@@ -29,20 +29,16 @@ The separate `random_excitation/SysID_rnd.py` script provides an experimental ra
 
 ## Installation and startup
 
-Use Python 3.11 or newer and Poetry 2 or newer. For this local development setup, keep `system-identification` and `machine-interfaces` next to each other:
-
-```text
-flight-simulator-repositories/
-    machine-interfaces/
-    system-identification/
-```
-
-From `system-identification`, run:
+Use Python 3.11 or newer and Poetry 2 or newer.
 
 ```bash
+git clone https://gitlab.cern.ch/flight-simulator/system-identification.git
+cd system-identification
 poetry install
 poetry run python SysID_GUI.py
 ```
+
+Poetry downloads and installs the required Python dependencies automatically.
 
 For quadrupole-mover measurements:
 
