@@ -21,7 +21,7 @@ from enum import Enum
 matplotlib.use('QtAgg')
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from machine_interfaces.Interfaces.interface_setup import INTERFACE_SETUP
+from machine_interfaces.Interfaces.interface_setup import INTERFACE_SETUP, get_intensity_labels
 from machine_interfaces.Backend.ActuatorMode import ActuatorMode
 
 class PlotPopup(QMainWindow):
@@ -297,7 +297,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.stop_requested = True
         QMessageBox.critical(
             self, "SysID error",
-            f"The {self.current_mode.name} measurement stopped because of an error:\n{message}\n\n"
+            f"The {self._mode_label(self.current_mode)} measurement stopped because of an error:\n{message}\n\n"
             "The machine is being restored to its nominal state; check it before restarting."
         )
 
@@ -319,6 +319,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.stop_requested = False
         self.cwd = os.getcwd()
         self.interface = interface
+        self._intensity_labels = get_intensity_labels(interface)
         self.actuator_mode = self.ACTUATOR_MODE
         bpms_list = interface.get_bpms()['names']
         correctors = self.interface.get_correctors()
@@ -361,9 +362,10 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.stop_button.clicked.connect(self.__stop_button_clicked)
         self.pause_button.clicked.connect(self.__pause_button_clicked)
         self.resume_button.clicked.connect(self.__unpause_button_clicked)
+        self._setup_measurement_modes()
         self.mode=Mode.Orbit
         self._update_folder_path()
-        self.choose_mode.currentTextChanged.connect(self._choose_the_correction_mode)
+        self.choose_mode.currentIndexChanged.connect(self._choose_the_correction_mode)
         self.correctors_list.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
         self.correctors_list.insertItems(0, correctors_list)
         self.actuator_mode_label.setVisible(False)
@@ -637,14 +639,14 @@ class MainWindow(QMainWindow, SaveOrLoad):
         os.chdir(dir_name)
         self.working_directory_input.setText(dir_name)
 
-        print(f"Currently at mode: {mode.name}")
-        self.__set_status_in_title(f"[Running {mode.name} mode]")
+        print(f"Currently at mode: {self._mode_label(mode)}")
+        self.__set_status_in_title(f"[Running {self._mode_label(mode)} mode]")
         self.progressBar.setValue(0)
         machine_state=self.state_class(filename=os.path.join(dir_name,'machine_status.pkl'))
         if self._restore_actuators_state(machine_state) is False:
             QMessageBox.warning(
                 self, "SysID restore",
-                f"Not every corrector was set back at its saved current before the {mode.name} measurement. Check the correctors on the machine.")
+                f"Not every corrector was set back at its saved current before the {self._mode_label(mode)} measurement. Check the correctors on the machine.")
 
         if mode==Mode.Orbit:
             #self.interface.reset_intensity()
@@ -654,7 +656,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
             print("Energy changed")
         elif mode==Mode.Wakefield:
             self.interface.change_intensity()
-            print("Intensity changed)")
+            print(self._intensity_labels["changed"])
         return
 
     def _read_all_parameters(self,text):
@@ -673,9 +675,17 @@ class MainWindow(QMainWindow, SaveOrLoad):
                 raise ValueError(f"Not a number encountered in {p}")
         return params
 
+    def _setup_measurement_modes(self):
+        self.choose_mode.clear()
+        for mode in Mode:
+            label = self._intensity_labels["mode"] if mode == Mode.Wakefield else mode.value
+            self.choose_mode.addItem(label, mode.name)
+
+    def _mode_label(self, mode):
+        return self._intensity_labels["status"] if mode == Mode.Wakefield else mode.name
+
     def _choose_the_correction_mode(self):
-        data_mode=self.choose_mode.currentText()
-        self.mode=Mode(data_mode)
+        self.mode = Mode[self.choose_mode.currentData()]
         self._update_folder_path()
 
     def __save_correctors_button_clicked(self):
@@ -956,7 +966,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
     def __unpause_button_clicked(self):
         if self.worker:
             mode = self.modes_to_do[self.counter]
-            self.__set_status_in_title(f"[Running {mode.name} mode]")
+            self.__set_status_in_title(f"[Running {self._mode_label(mode)} mode]")
             self.worker.unpause()
 
     def _device_position_on_bpm_axis(self, device_name, bpm_names):
