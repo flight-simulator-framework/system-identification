@@ -1,0 +1,1086 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1512</width>
+    <height>782</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SYSID</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="leftMargin">
+     <number>16</number>
+    </property>
+    <property name="topMargin">
+     <number>16</number>
+    </property>
+    <property name="rightMargin">
+     <number>16</number>
+    </property>
+    <property name="bottomMargin">
+     <number>16</number>
+    </property>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+      <item>
+       <layout class="QHBoxLayout" name="horizontal_layout" stretch="0,1">
+        <item>
+         <widget class="QGroupBox" name="devicesGroup">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QGroupBox#devicesGroup {
+    background-color: rgb(245, 245, 245);
+    border: 1px solid rgb(210, 210, 210);
+    border-radius: 6px;
+    margin-top: 8px;
+    padding-top: 6px;
+}
+QGroupBox#devicesGroup::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 4px 0 4px;
+}</string>
+          </property>
+          <property name="title">
+           <string>Devices</string>
+          </property>
+          <layout class="QVBoxLayout" name="left_layout" stretch="1,1">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <property name="leftMargin">
+            <number>8</number>
+           </property>
+           <property name="topMargin">
+            <number>8</number>
+           </property>
+           <property name="rightMargin">
+            <number>8</number>
+           </property>
+           <property name="bottomMargin">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="correctorsGroup">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox#correctorsGroup {
+    background-color: rgb(245, 245, 245);
+    border: 1px solid rgb(210, 210, 210);
+    border-radius: 6px;
+    margin-top: 8px;
+    padding-top: 6px;
+}
+QGroupBox#correctorsGroup::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 4px 0 4px;
+}</string>
+             </property>
+             <property name="title">
+              <string>Correctors</string>
+             </property>
+             <layout class="QVBoxLayout" name="correctors_group_vbox" stretch="0,0,1,0">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>8</number>
+              </property>
+              <property name="topMargin">
+               <number>8</number>
+              </property>
+              <property name="rightMargin">
+               <number>8</number>
+              </property>
+              <property name="bottomMargin">
+               <number>8</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="corrector_filter_label">
+                <property name="text">
+                 <string>Input selection pattern for correctors:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="corrector_filter_layout">
+                <item>
+                 <widget class="QLineEdit" name="pattern_corrs_input"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QListWidget" name="correctors_list">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::NoSelection</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="correctors_buttons_layout">
+                <item>
+                 <widget class="QPushButton" name="save_correctors_button">
+                  <property name="text">
+                   <string>Save As..</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="load_correctors_button">
+                  <property name="text">
+                   <string>Load..</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="clear_correctors_button">
+                  <property name="text">
+                   <string>Clear</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="bpmsGroup">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox#bpmsGroup {
+    background-color: rgb(245, 245, 245);
+    border: 1px solid rgb(210, 210, 210);
+    border-radius: 6px;
+    margin-top: 8px;
+    padding-top: 6px;
+}
+QGroupBox#bpmsGroup::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 4px 0 4px;
+}</string>
+             </property>
+             <property name="title">
+              <string>BPMs</string>
+             </property>
+             <layout class="QVBoxLayout" name="bpms_group_vbox" stretch="1,0">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>8</number>
+              </property>
+              <property name="topMargin">
+               <number>8</number>
+              </property>
+              <property name="rightMargin">
+               <number>8</number>
+              </property>
+              <property name="bottomMargin">
+               <number>8</number>
+              </property>
+              <item>
+               <widget class="QListWidget" name="bpms_list">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::NoSelection</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="bpms_buttons_layout">
+                <item>
+                 <widget class="QPushButton" name="save_bpms_button">
+                  <property name="text">
+                   <string>Save As..</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="load_bpms_button">
+                  <property name="text">
+                   <string>Load..</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="clear_bpms_button">
+                  <property name="text">
+                   <string>Clear</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="right_layout" stretch="0,0,1">
+          <property name="spacing">
+           <number>2</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="topRowLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QVBoxLayout" name="topGroupsLayout">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QGroupBox" name="dataStorageGroup">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QGroupBox#dataStorageGroup {
+    background-color: rgb(245, 245, 245);
+    border: 1px solid rgb(210, 210, 210);
+    border-radius: 6px;
+    margin-top: 0px;
+    padding-top: 6px;
+}
+QGroupBox#dataStorageGroup::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 4px 0 4px;
+}</string>
+                </property>
+                <property name="title">
+                 <string>Data storage</string>
+                </property>
+                <layout class="QVBoxLayout" name="dataStorageVBox">
+                 <property name="spacing">
+                  <number>8</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>8</number>
+                 </property>
+                 <item>
+                  <layout class="QGridLayout" name="gridActions">
+                   <property name="horizontalSpacing">
+                    <number>12</number>
+                   </property>
+                   <property name="verticalSpacing">
+                    <number>6</number>
+                   </property>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_working_directory">
+                     <property name="text">
+                      <string>Working directory</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="working_directory_input"/>
+                   </item>
+                   <item row="0" column="2">
+                    <widget class="QPushButton" name="working_directory_dialog">
+                     <property name="text">
+                      <string>...</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="options_groupbox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QGroupBox {
+    background-color: rgb(245, 245, 245);
+    border: 1px solid rgb(210, 210, 210);
+    border-radius: 6px;
+    margin-top: 8px;
+    padding-top: 6px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 4px 0 4px;
+}</string>
+                </property>
+                <property name="title">
+                 <string>Options</string>
+                </property>
+                <layout class="QGridLayout" name="options_grid">
+                 <property name="leftMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>16</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>12</number>
+                 </property>
+                 <property name="horizontalSpacing">
+                  <number>10</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>8</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label">
+                   <property name="minimumSize">
+                    <size>
+                     <width>120</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>120</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Correction Mode</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="choose_mode">
+                   <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>Orbit Correction</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Changed energy</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Changed intensity</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>All modes at once</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="cycle_mode_label">
+                   <property name="maximumSize">
+                    <size>
+                     <width>170</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Number of cycles</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3" colspan="2">
+                  <widget class="QLineEdit" name="niter_number">
+                   <property name="maximumSize">
+                    <size>
+                     <width>150</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>2</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="initial_hkick_label">
+                   <property name="minimumSize">
+                    <size>
+                     <width>120</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>120</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Initial hkick</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="initial_hkick_settings">
+                   <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="current_label">
+                   <property name="maximumSize">
+                    <size>
+                     <width>170</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Max strength (gauss*m)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QLabel" name="horizontal_current_label">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>H:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="4">
+                  <widget class="QDoubleSpinBox" name="max_horizontal_current_spinbox">
+                   <property name="maximumSize">
+                    <size>
+                     <width>70</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="decimals">
+                    <number>5</number>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.001000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.000000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="5">
+                  <widget class="QLabel" name="vertical_current_label">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>V:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="6">
+                  <widget class="QDoubleSpinBox" name="max_vertical_current_spinbox">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>70</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="decimals">
+                    <number>5</number>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.010000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="initial_vkick_label">
+                   <property name="minimumSize">
+                    <size>
+                     <width>120</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>120</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Initial vkick</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLineEdit" name="initial_vkick_settings">
+                   <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QLabel" name="excursion_label">
+                   <property name="maximumSize">
+                    <size>
+                     <width>170</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Target orbit excursion (mm)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="3">
+                  <widget class="QLabel" name="horizontal_excursion_label">
+                   <property name="text">
+                    <string>H:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="4">
+                  <widget class="QDoubleSpinBox" name="horizontal_excursion_spinbox">
+                   <property name="maximumSize">
+                    <size>
+                     <width>70</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="decimals">
+                    <number>5</number>
+                   </property>
+                   <property name="maximum">
+                    <double>10000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.500000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="5">
+                  <widget class="QLabel" name="vertical_excursion_label">
+                   <property name="text">
+                    <string>V:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="6">
+                  <widget class="QDoubleSpinBox" name="vertical_excursion_spinbox">
+                   <property name="maximumSize">
+                    <size>
+                     <width>70</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="decimals">
+                    <number>5</number>
+                   </property>
+                   <property name="maximum">
+                    <double>10000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.500000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="actuator_mode_label">
+                   <property name="minimumSize">
+                    <size>
+                     <width>120</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>120</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Actuator type</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QComboBox" name="actuator_mode_combo">
+                   <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
+                  <widget class="QLabel" name="nsamples_label">
+                   <property name="minimumSize">
+                    <size>
+                     <width>120</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>120</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>BPM samples</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="1">
+                 <widget class="QLineEdit" name="nsamples_input">
+                   <property name="toolTip">
+                    <string>Number of BPM samples acquired for each SysID measurement. Larger values reduce random noise but increase measurement time.</string>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="2">
+                  <widget class="QToolButton" name="nsamples_tooltip">
+                   <property name="toolTip">
+                    <string>Number of BPM samples acquired for each SysID measurement. Larger values reduce random noise but increase measurement time.</string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QToolButton#nsamples_tooltip {
+    border: 1px solid #888;
+    border-radius: 10px;
+    min-width: 20px;
+    max-width: 20px;
+    min-height: 20px;
+    max-height: 20px;
+    padding: 0px;
+    font-weight: bold;
+}
+QToolButton#nsamples_tooltip:hover {
+    background-color: #e6e6e6;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>?</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="0" colspan="7">
+                  <layout class="QHBoxLayout" name="beam_change_groups_layout">
+                   <property name="spacing"><number>12</number></property>
+                   <property name="leftMargin"><number>0</number></property>
+                   <property name="topMargin"><number>0</number></property>
+                   <property name="rightMargin"><number>0</number></property>
+                   <property name="bottomMargin"><number>0</number></property>
+                   <item>
+                    <widget class="QGroupBox" name="intensity_change_group">
+                     <property name="title"><string>Change intensity</string></property>
+                     <layout class="QHBoxLayout" name="intensity_change_values_layout">
+                      <property name="spacing"><number>6</number></property>
+                      <property name="leftMargin"><number>8</number></property>
+                      <property name="topMargin"><number>8</number></property>
+                      <property name="rightMargin"><number>8</number></property>
+                      <property name="bottomMargin"><number>8</number></property>
+                      <item>
+                       <widget class="QWidget" name="intensity_nominal_container">
+                        <layout class="QHBoxLayout" name="intensity_nominal_value_layout">
+                         <property name="spacing"><number>6</number></property>
+                         <property name="leftMargin"><number>0</number></property>
+                         <property name="topMargin"><number>0</number></property>
+                         <property name="rightMargin"><number>0</number></property>
+                         <property name="bottomMargin"><number>0</number></property>
+                         <item>
+                          <widget class="QLabel" name="intensity_nominal_label">
+                           <property name="text"><string>Nominal</string></property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLineEdit" name="intensity_nominal_input">
+                           <property name="maximumSize"><size><width>110</width><height>16777215</height></size></property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QWidget" name="intensity_test_container">
+                        <layout class="QHBoxLayout" name="intensity_test_value_layout">
+                         <property name="spacing"><number>6</number></property>
+                         <property name="leftMargin"><number>0</number></property>
+                         <property name="topMargin"><number>0</number></property>
+                         <property name="rightMargin"><number>0</number></property>
+                         <property name="bottomMargin"><number>0</number></property>
+                         <item>
+                          <widget class="QLabel" name="intensity_test_label">
+                           <property name="text"><string>Test</string></property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLineEdit" name="intensity_test_input">
+                           <property name="maximumSize"><size><width>110</width><height>16777215</height></size></property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QToolButton" name="intensity_change_tooltip">
+                        <property name="styleSheet">
+                         <string notr="true">QToolButton#intensity_change_tooltip {
+    border: 1px solid #888;
+    border-radius: 10px;
+    min-width: 20px;
+    max-width: 20px;
+    min-height: 20px;
+    max-height: 20px;
+    padding: 0px;
+    font-weight: bold;
+}
+QToolButton#intensity_change_tooltip:hover {
+    background-color: #e6e6e6;
+}</string>
+                        </property>
+                        <property name="text"><string>?</string></property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="intensity_change_right_spacer">
+                        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                        <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+                        <property name="sizeHint" stdset="0"><size><width>0</width><height>20</height></size></property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QGroupBox" name="energy_change_group">
+                     <property name="title"><string>Change energy</string></property>
+                     <layout class="QHBoxLayout" name="energy_change_values_layout">
+                      <property name="spacing"><number>6</number></property>
+                      <property name="leftMargin"><number>8</number></property>
+                      <property name="topMargin"><number>8</number></property>
+                      <property name="rightMargin"><number>8</number></property>
+                      <property name="bottomMargin"><number>8</number></property>
+                      <item>
+                       <widget class="QWidget" name="energy_nominal_container">
+                        <layout class="QHBoxLayout" name="energy_nominal_value_layout">
+                         <property name="spacing"><number>6</number></property>
+                         <property name="leftMargin"><number>0</number></property>
+                         <property name="topMargin"><number>0</number></property>
+                         <property name="rightMargin"><number>0</number></property>
+                         <property name="bottomMargin"><number>0</number></property>
+                         <item>
+                          <widget class="QLabel" name="energy_nominal_label">
+                           <property name="text"><string>Nominal</string></property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLineEdit" name="energy_nominal_input">
+                           <property name="maximumSize"><size><width>110</width><height>16777215</height></size></property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QWidget" name="energy_test_container">
+                        <layout class="QHBoxLayout" name="energy_test_value_layout">
+                         <property name="spacing"><number>6</number></property>
+                         <property name="leftMargin"><number>0</number></property>
+                         <property name="topMargin"><number>0</number></property>
+                         <property name="rightMargin"><number>0</number></property>
+                         <property name="bottomMargin"><number>0</number></property>
+                         <item>
+                          <widget class="QLabel" name="energy_test_label">
+                           <property name="text"><string>Test</string></property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLineEdit" name="energy_test_input">
+                           <property name="maximumSize"><size><width>110</width><height>16777215</height></size></property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QToolButton" name="energy_change_tooltip">
+                        <property name="styleSheet">
+                         <string notr="true">QToolButton#energy_change_tooltip {
+    border: 1px solid #888;
+    border-radius: 10px;
+    min-width: 20px;
+    max-width: 20px;
+    min-height: 20px;
+    max-height: 20px;
+    padding: 0px;
+    font-weight: bold;
+}
+QToolButton#energy_change_tooltip:hover {
+    background-color: #e6e6e6;
+}</string>
+                        </property>
+                        <property name="text"><string>?</string></property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="energy_change_right_spacer">
+                        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+                        <property name="sizeType"><enum>QSizePolicy::Expanding</enum></property>
+                        <property name="sizeHint" stdset="0"><size><width>0</width><height>20</height></size></property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item alignment="Qt::AlignRight|Qt::AlignTop">
+             <widget class="QLabel" name="logo_label">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>90</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>220</width>
+                <height>120</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QWidget" name="plot_widget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>400</width>
+              <height>300</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="buttons_layout">
+        <item>
+         <widget class="QPushButton" name="start_button">
+          <property name="styleSheet">
+           <string notr="true">background-color: red; color: white;</string>
+          </property>
+          <property name="text">
+           <string>START</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="stop_button">
+          <property name="styleSheet">
+           <string notr="true">background-color: green; color: white;</string>
+          </property>
+          <property name="text">
+           <string>STOP</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pause_button">
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Pause</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="resume_button">
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Resume</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
