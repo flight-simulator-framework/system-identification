@@ -6,20 +6,33 @@ For correctors, the application applies positive and negative kicks relative to 
 
 ## Usage
 
-Select the correctors to excite and the BPMs to include in the measurements.
+Select the machine or simulation interface, the correctors to excite and the BPMs to include in the measurements.
 
 In the GUI, configure:
+
 - Initial horizontal and vertical kick amplitudes.
 - Optional beam energy and intensity changes.
 - Maximum corrector strengths.
 - Target horizontal and vertical orbit excursions.
+- Number of iterations and output directory.
 
-During successive SysID cycles, the application adjusts the kick amplitudes to approach the target orbit excursion while respecting the configured corrector limits.
+During successive SysID cycles, the application adjusts the kick amplitudes to approach the target orbit excursion while respecting the configured corrector limits. The amplitudes can increase or decrease depending on the measured response.
+
+Monitor the response plots during acquisition. Paired positive/negative measurements are saved as `DATA*.pkl` snapshots for offline reconstruction in Response Matrix.
+
+## GUI variants
+
+- `SysID_GUI.py`: excitation using corrector magnets.
+- `SysID_QM_GUI.py`: excitation using horizontal and vertical quadrupole-mover displacements, with configurable displacement ranges and target orbit excursions.
+
+The separate `random_excitation/SysID_rnd.py` script provides an experimental random-excitation version of the application.
 
 ## Installation
 
-From the repository directory, install the dependencies:
+Use Python 3.11 or newer and Poetry 2 or newer. From the repository directory, install the dependencies:
 
 ```bash
 poetry install
 ```
+
+Shared code is provided by `machine-interfaces`.
