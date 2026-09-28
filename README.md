@@ -34,6 +34,7 @@ Use Python 3.11 or newer and Poetry 2 or newer.
 ```bash
 git clone https://gitlab.cern.ch/flight-simulator/system-identification.git
 cd system-identification
+poetry update rf-track --lock
 poetry install
 poetry run python SysID_GUI.py
 ```
@@ -45,4 +46,3 @@ For quadrupole-mover measurements:
 ```bash
 poetry run python SysID_QM_GUI.py
 ```
-
