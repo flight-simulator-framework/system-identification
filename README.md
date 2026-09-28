@@ -40,12 +40,20 @@ python3 -m pip install "poetry>=2"
 ```
 
 ```bash
-git clone https://gitlab.cern.ch/flight-simulator/system-identification.git
 cd system-identification
-poetry update rf-track --lock
-poetry install --extras clear
+poetry env use python3.12
+poetry install --extras esrf
+export tango host here, for esrf!
 poetry run python SysID_GUI.py
 ```
+
+export TANGO_HOST="acs.esrf.fr:10000,acs.esrf.fr:11000"
+poetry run python SysID_GUI.pycd system-identification
+git pull --ff-only
+poetry env use python3.12
+poetry install --extras esrf
+export TANGO_HOST="acs.esrf.fr:10000,acs.esrf.fr:11000"
+poetry run python SysID_GUI.py
 
 For quadrupole-mover measurements:
 
