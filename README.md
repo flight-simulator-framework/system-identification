@@ -29,17 +29,23 @@ The separate `random_excitation/SysID_rnd.py` script provides an experimental ra
 
 ## Installation and startup
 
+You can choose machines: `atf2`, `clear`, `esrf`, `facet2`.
+
+Example: `poetry install --extras clear`
+
+Use Python 3.11 or newer and Poetry 2 or newer.
 
 ```bash
-git clone https://gitlab.cern.ch/flight-simulator/machine-interfaces.git
+python3 -m pip install "poetry>=2"
+```
+
+```bash
 git clone https://gitlab.cern.ch/flight-simulator/system-identification.git
 cd system-identification
 poetry update rf-track --lock
 poetry install --extras clear
 poetry run python SysID_GUI.py
 ```
-
-Keep these repositories in the same parent directory; Poetry uses their local editable packages. The selected extra installs only that machine adapter and its dependencies. Available machine extras: `clear`, `atf2`, `facet2`, `esrf`; combine them with `--extras "clear atf2"` when needed.
 
 For quadrupole-mover measurements:
 

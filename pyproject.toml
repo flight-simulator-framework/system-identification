@@ -38,11 +38,11 @@ build-backend = "poetry.core.masonry.api"
 packages = [{include = "system_identification"}, {include = "SysID_GUI.py"}, {include = "SysID_QM_GUI.py"}]
 
 [tool.poetry.dependencies]
-machine-interfaces = {path = "../machine-interfaces", develop = true}
-machine-interfaces-clear = {path = "../machine-interfaces/backends/clear", develop = true}
-machine-interfaces-atf2 = {path = "../machine-interfaces/backends/atf2", develop = true}
-machine-interfaces-facet2 = {path = "../machine-interfaces/backends/facet2", develop = true}
-machine-interfaces-esrf = {path = "../machine-interfaces/backends/esrf", develop = true}
+machine-interfaces = {source = "flight-simulator"}
+machine-interfaces-clear = {source = "flight-simulator"}
+machine-interfaces-atf2 = {source = "flight-simulator"}
+machine-interfaces-facet2 = {source = "flight-simulator"}
+machine-interfaces-esrf = {source = "flight-simulator"}
 pyda = {source = "cern-acc-py", python = ">=3.11,<4"}
 pyda-japc = {source = "cern-acc-py", python = ">=3.11,<4"}
 pyrbac = {source = "cern-acc-py", python = ">=3.11,<4"}
@@ -52,6 +52,9 @@ cmmnbuild-dep-manager = {source = "cern-acc-py", python = ">=3.11,<4"}
 name = "cern-acc-py"
 url = "https://acc-py-repo.cern.ch/repository/vr-py-releases/simple/"
 priority = "explicit"
+[[tool.poetry.source]]
+name = "flight-simulator"
+url = "https://gitlab.cern.ch/api/v4/groups/363527/-/packages/pypi/simple/"
+priority = "explicit"
 [tool.flight-simulator.migration]
-status = "sysid-local-execution-ready"
-repository-dependencies = ["machine-interfaces"]
+status = "package-registry"
