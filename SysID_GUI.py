@@ -659,22 +659,6 @@ class MainWindow(QMainWindow, SaveOrLoad):
             print(self._intensity_labels["changed"])
         return
 
-    def _read_all_parameters(self,text):
-        text = text.strip()
-        params = {}
-        for p in text.split(","):
-            p = p.strip()
-            if not p:
-                continue
-            k,v = p.split("=",1)
-            k = k.strip()
-            v = v.strip()
-            try:
-                params[k] = float(v)
-            except ValueError:
-                raise ValueError(f"Not a number encountered in {p}")
-        return params
-
     def _setup_measurement_modes(self):
         self.choose_mode.clear()
         for mode in Mode:
@@ -705,16 +689,6 @@ class MainWindow(QMainWindow, SaveOrLoad):
 
     def __clear_bpms_button_clicked(self):
         self.bpms_list.clearSelection()
-
-    def _read_initial_kicks(self):
-        text=self.initial_hkick_settings.text().strip()
-        if not text:
-            return 0.1
-        try:
-            return float(text)
-        except ValueError as e:
-            print(e)
-            return 0.1
 
     def _sort_elements(self, unsorted_names, which='corrs'):
         unsorted_names = [str(name) for name in unsorted_names]
