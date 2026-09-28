@@ -47,14 +47,6 @@ export tango host here, for esrf!
 poetry run python SysID_GUI.py
 ```
 
-export TANGO_HOST="acs.esrf.fr:10000,acs.esrf.fr:11000"
-poetry run python SysID_GUI.pycd system-identification
-git pull --ff-only
-poetry env use python3.12
-poetry install --extras esrf
-export TANGO_HOST="acs.esrf.fr:10000,acs.esrf.fr:11000"
-poetry run python SysID_GUI.py
-
 For quadrupole-mover measurements:
 
 ```bash
