@@ -1,5 +1,5 @@
-#from machine_interfaces.Interfaces.FACET2.InterfaceFACET2_Linac import InterfaceFACET2_Linac
-from machine_interfaces.Interfaces.FACET2.InterfaceFACET2_Linac_RFTrack import InterfaceFACET2_Linac_RFTrack
+#from machine_interfaces_facet2.InterfaceFACET2_Linac import InterfaceFACET2_Linac
+from machine_interfaces_facet2.InterfaceFACET2_Linac_RFTrack import InterfaceFACET2_Linac_RFTrack
 from machine_interfaces.Backend.State import State
 import numpy as np
 import fnmatch

@@ -1,6 +1,6 @@
 [project]
 name = "flight-system-identification"
-version = "0.1.0"
+version = "0.2.0"
 description = "Machine excitation and acquisition for corrector and quadrupole-mover system identification."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -9,9 +9,27 @@ dependencies = [
     "numpy>=2.4.2,<3",
     "matplotlib>=3.10.8,<4",
     "PyQt6>=6.10.2,<7",
-    "machine-interfaces[epics,madx,rftrack,tao] @ git+https://gitlab.cern.ch/flight-simulator/machine-interfaces.git@1fa7fca06f949e085353030f59587a68de7e3baf"
+    "machine-interfaces>=0.2.0,<0.3",
 ]
 
+[project.optional-dependencies]
+clear = [
+    "machine-interfaces-clear>=0.2.0,<0.3",
+    "pyda (>=1.1.0,<1.2) ; python_version >= \"3.11\" and python_version < \"4\"",
+    "pyda-japc (>=1.1.0,<1.2) ; python_version >= \"3.11\" and python_version < \"4\"",
+    "pyrbac (>=1.0,<2) ; python_version >= \"3.11\" and python_version < \"4\"",
+    "pyccda (>=1.29.4) ; python_version >= \"3.11\" and python_version < \"4\"",
+    "cmmnbuild-dep-manager (>=2.13,<3) ; python_version >= \"3.11\" and python_version < \"4\"",
+]
+atf2 = [
+    "machine-interfaces-atf2>=0.2.0,<0.3",
+]
+facet2 = [
+    "machine-interfaces-facet2>=0.2.0,<0.3",
+]
+esrf = [
+    "machine-interfaces-esrf>=0.2.0,<0.3",
+]
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
@@ -19,6 +37,21 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 packages = [{include = "system_identification"}, {include = "SysID_GUI.py"}, {include = "SysID_QM_GUI.py"}]
 
+[tool.poetry.dependencies]
+machine-interfaces = {path = "../machine-interfaces", develop = true}
+machine-interfaces-clear = {path = "../machine-interfaces/backends/clear", develop = true}
+machine-interfaces-atf2 = {path = "../machine-interfaces/backends/atf2", develop = true}
+machine-interfaces-facet2 = {path = "../machine-interfaces/backends/facet2", develop = true}
+machine-interfaces-esrf = {path = "../machine-interfaces/backends/esrf", develop = true}
+pyda = {source = "cern-acc-py", python = ">=3.11,<4"}
+pyda-japc = {source = "cern-acc-py", python = ">=3.11,<4"}
+pyrbac = {source = "cern-acc-py", python = ">=3.11,<4"}
+pyccda = {source = "cern-acc-py", python = ">=3.11,<4"}
+cmmnbuild-dep-manager = {source = "cern-acc-py", python = ">=3.11,<4"}
+[[tool.poetry.source]]
+name = "cern-acc-py"
+url = "https://acc-py-repo.cern.ch/repository/vr-py-releases/simple/"
+priority = "explicit"
 [tool.flight-simulator.migration]
 status = "sysid-local-execution-ready"
 repository-dependencies = ["machine-interfaces"]
