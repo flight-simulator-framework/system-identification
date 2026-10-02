@@ -420,6 +420,20 @@ class MainWindow(QMainWindow, SaveOrLoad):
 
     def _setup_beam_change_controls(self):
         beam_change = (self._get_interface_initial_settings() or {}).get("beam_change", {})
+        self._beam_change_texts = {}
+        self._beam_change_fields = []
+        self.beam_change_method_combo.clear()
+        self.beam_change_method_combo.addItems(beam_change.get("methods", []))
+        self.beam_change_method_container.setVisible(self.beam_change_method_combo.count() > 0)
+        self.beam_change_method_combo.currentTextChanged.connect(self._refresh_beam_change_controls)
+        self._refresh_beam_change_controls()
+
+    def _refresh_beam_change_controls(self):
+        for widget, field in self._beam_change_fields:
+            self._beam_change_texts[field["attribute"]] = widget.text()
+        beam_change = (self._get_interface_initial_settings() or {}).get("beam_change", {})
+        self._beam_change_method = self.beam_change_method_combo.currentText()
+        profile = beam_change.get("method_settings", {}).get(self._beam_change_method, {})
         self._beam_change_fields = []
         controls = {
             "energy": (
@@ -454,7 +468,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
                 test_input,
                 tooltip,
             ) = widgets
-            settings = beam_change.get(kind)
+            settings = profile.get(kind, beam_change.get(kind))
             title.setVisible(settings is not None)
             tooltip.setVisible(settings is not None)
             if settings is None:
@@ -473,7 +487,8 @@ class MainWindow(QMainWindow, SaveOrLoad):
                     continue
                 label.setText(field["label"])
                 value = getattr(self.interface, field["attribute"], field.get("default", ""))
-                input_widget.setText("" if value is None else str(value))
+                input_widget.setText(self._beam_change_texts.get(field["attribute"], "" if value is None else str(value)))
+                input_widget.setStyleSheet("")
                 self._beam_change_fields.append((input_widget, field))
 
     def _apply_beam_change_controls(self):
@@ -666,7 +681,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
             self.choose_mode.addItem(label, mode.name)
 
     def _mode_label(self, mode):
-        return self._intensity_labels["status"] if mode == Mode.Wakefield else mode.name
+        return self._intensity_labels["status_mode_name"] if mode == Mode.Wakefield else mode.name
 
     def _choose_the_correction_mode(self):
         self.mode = Mode[self.choose_mode.currentData()]
