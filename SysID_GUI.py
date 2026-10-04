@@ -23,6 +23,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from machine_interfaces.Interfaces.interface_setup import INTERFACE_SETUP, get_intensity_labels
 from machine_interfaces.Backend.ActuatorMode import ActuatorMode
+from machine_interfaces.Backend.EnergyChangeMethod import EnergyChangeMethod
 
 class PlotPopup(QMainWindow):
     def __init__(self, title="SysID", parent=None):
@@ -406,6 +407,8 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.pattern_corrs_input.textChanged.connect(self.pattern_matching)
         self.sysid_plot_popup = None
         self._last_plot_data = None
+        self.method = self.beam_change_method_combo.currentData()
+        print(self.method)
 
     def _setup_nsamples_control(self):
         self.nsamples_input.setText(str(max(1, int(self.interface.nsamples))))
@@ -423,7 +426,9 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self._beam_change_texts = {}
         self._beam_change_fields = []
         self.beam_change_method_combo.clear()
-        self.beam_change_method_combo.addItems(beam_change.get("methods", []))
+        for label in beam_change["methods"]:
+            self.method = EnergyChangeMethod(beam_change["method_ids"][label])
+            self.beam_change_method_combo.addItem(label, self.method)
         self.beam_change_method_container.setVisible(self.beam_change_method_combo.count() > 0)
         self.beam_change_method_combo.currentTextChanged.connect(self._refresh_beam_change_controls)
         self._refresh_beam_change_controls()
@@ -667,7 +672,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
             #self.interface.reset_intensity()
             print("Nominal beam state confirmed for Orbit mode")
         elif mode==Mode.Dispersion:
-            self.interface.change_energy()
+            self.interface.change_energy(method=self.method)
             print("Energy changed")
         elif mode==Mode.Wakefield:
             self.interface.change_intensity()
@@ -765,12 +770,12 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.progressBar.setValue(0)
         self._set_directory_edit_enabled(False)
         self.stop_requested=False
+        self.method = self.beam_change_method_combo.currentData()
         if self.thread and self.thread.isRunning():
             return  # already running
         if not self._apply_beam_change_controls():
             self._set_directory_edit_enabled(True)
             return
-
         if not self._validate_start():
             self._set_directory_edit_enabled(True)
             return
@@ -869,7 +874,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
                 if self.current_mode==Mode.Orbit:
                     print("Orbit mode active.")
                 elif self.current_mode==Mode.Dispersion:
-                    self.interface.reset_energy()
+                    self.interface.reset_energy(method=self.method)
                 elif self.current_mode==Mode.Wakefield:
                     self.interface.reset_intensity()
             except Exception as e:
