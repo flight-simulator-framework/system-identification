@@ -591,8 +591,8 @@ class MainWindow(QMainWindow, SaveOrLoad):
 
     def _refresh_actuator_labels(self):
         self.correctorsGroup.setTitle("Correctors")
-        self.initial_hkick_label.setText("Initial hkick")
-        self.initial_vkick_label.setText("Initial vkick")
+        self.initial_hkick_label.setText(f"Initial hkick ({self.corrs_unit})")
+        self.initial_vkick_label.setText(f"Initial vkick ({self.corrs_unit})")
         self.current_label.setText(f"Max strength ({self.corrs_unit})")
         self.horizontal_current_label.setText("H:")
         self.vertical_current_label.setText("V:")
