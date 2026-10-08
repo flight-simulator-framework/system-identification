@@ -302,13 +302,19 @@ class MainWindow(QMainWindow, SaveOrLoad):
             "The machine is being restored to its nominal state; check it before restarting."
         )
 
+    def _mode_directory_name(self, mode):
+        if mode == Mode.Dispersion and self.beam_change_method_combo.currentData() == EnergyChangeMethod.QUADRUPOLE_SCALING:
+            return "Quadrupole_scaling"
+        return mode.name
+
     def _update_folder_path(self):
         base = os.path.expanduser(os.path.expandvars("~/CERN-Flight_Simulator-Data"))
         project_name=self.interface.get_name()
         mode=self.mode
         time_str = datetime.now().strftime("%Y%m%d_%H%M%S")
         actuator_tag = self.actuator_mode.name if hasattr(self, "actuator_mode") else "Kicker"
-        folder_path = os.path.join(base, f"{project_name}_{time_str}_{actuator_tag}_{mode.name}")
+        folder_path = os.path.join(base, f"{project_name}_{time_str}_{actuator_tag}_{self._mode_directory_name(mode)}")
+        self._default_output_dir = folder_path
         self.working_directory_input.setText(folder_path)
 
     def __init__(self, interface, dir_name):
@@ -430,8 +436,13 @@ class MainWindow(QMainWindow, SaveOrLoad):
             self.method = EnergyChangeMethod(beam_change["method_ids"][label])
             self.beam_change_method_combo.addItem(label, self.method)
         self.beam_change_method_container.setVisible(self.beam_change_method_combo.count() > 0)
-        self.beam_change_method_combo.currentTextChanged.connect(self._refresh_beam_change_controls)
+        self.beam_change_method_combo.currentTextChanged.connect(self._on_beam_change_method_changed)
         self._refresh_beam_change_controls()
+
+    def _on_beam_change_method_changed(self):
+        self._refresh_beam_change_controls()
+        if self.mode == Mode.Dispersion and self.working_directory_input.isEnabled() and self.working_directory_input.text() == self._default_output_dir:
+            self._update_folder_path()
 
     def _refresh_beam_change_controls(self):
         for widget, field in self._beam_change_fields:
@@ -816,7 +827,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
                 d=resume_directory
             else:
                 time_str=datetime.now().strftime("%Y%m%d_%H%M%S")
-                d = os.path.join(base, f"{project_name}_{time_str}_{self.actuator_mode.name}_{mode.name}")
+                d = os.path.join(base, f"{project_name}_{time_str}_{self.actuator_mode.name}_{self._mode_directory_name(mode)}")
             os.makedirs(d, exist_ok=True)
             self.mode_dirs[mode] = d
             self._save_names_if_missing(d, self._actuator_selection_filename(), selected_correctors)
