@@ -119,14 +119,14 @@ class Worker(QObject):
         def measured(corrector, it):
             return os.path.isfile(data_file(corrector, "p", it)) and os.path.isfile(data_file(corrector, "m", it))
 
-        total_steps = max(sum(not measured(c, it) for it in range(self.Niter) for c in self.correctors), 1)  # files already on disk are not measured again
+        total_steps = max(sum(not measured(c, it) for it in range(self.Niter) for c in self.correctors), 1)  # if a file is missing, a step is added, if both are present, they are not considered worth iterating
 
         def clamp(val, max_val):
             if max_val == 0.0:
                 return val
             return max(-max_val, min(val, max_val))
 
-        def set_corrector(corrector, current):  # the interface retries until the readback confirms the setpoint
+        def set_corrector(corrector, current):
             return I.set_correctors(corrector, current) is not False
 
         for it in range(self.Niter):
@@ -198,7 +198,7 @@ class Worker(QObject):
                     for i, c in enumerate(self.correctors):
                         f.write(f'{c} {hkicks[i]} {vkicks[i]}\n')
                 if measured_this_corr:
-                    t0 = time.monotonic()  # saves current time, but not a system time, it's for measuring time difference
+                    t0 = time.monotonic() #saves current time, but not a system time, it's for measuring time difference
                     while self.running and (time.monotonic() - t0) < 1:
                         time.sleep(0.05)
 
@@ -818,7 +818,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
         return True
 
     def _on_mode_finished(self):
-        # restores the nominal beam and correctors, then runs the next mode (if any)
+        # Cleanup after thread is done
         try:
             if self.current_mode == Mode.Dispersion:
                 self.interface.reset_energy(method=self.method)
