@@ -45,7 +45,7 @@ class Mode(Enum):
     All = "All modes at once"
 
 class MatplotlibWidget(FigureCanvas):
-    def __init__(self, parent=None, title='', orbit=None):
+    def __init__(self, parent=None):
         fig = Figure(tight_layout=True)
         super().__init__(fig)
         self.setParent(parent)
@@ -109,33 +109,27 @@ class Worker(QObject):
     def _run_impl(self):
         self.running = True
         self.paused = False
-        self.progress_value=0
+        self.progress_value = 0
         I = self.interface
-        vkicks = self.vkicks
-        hkicks = self.hkicks
-        pending_steps=0
-        for iter in range(self.Niter):
-            for corrector in self.correctors:
-                filename_p=os.path.join(self.output_dir, f'DATA_{corrector}_p{iter:04d}.pkl')
-                filename_m = os.path.join(self.output_dir, f'DATA_{corrector}_m{iter:04d}.pkl')
-                if not (os.path.isfile(filename_p) and os.path.isfile(filename_m)):
-                    pending_steps+=1 # if a file is missing, a step is added, if both are present, they are not considered worth iterating
-        total_steps=max(pending_steps,1)
+        hkicks, vkicks = self.hkicks, self.vkicks
 
+        def data_file(corrector, sign, it):
+            return os.path.join(self.output_dir, f'DATA_{corrector}_{sign}{it:04d}.pkl')
+
+        def measured(corrector, it):
+            return os.path.isfile(data_file(corrector, "p", it)) and os.path.isfile(data_file(corrector, "m", it))
+
+        total_steps = max(sum(not measured(c, it) for it in range(self.Niter) for c in self.correctors), 1)  # files already on disk are not measured again
 
         def clamp(val, max_val):
             if max_val == 0.0:
                 return val
             return max(-max_val, min(val, max_val))
 
-        def set_corrector_with_retry(corrector, current, attempts=3):
-            for attempt in range(1, attempts + 1):
-                if I.set_correctors(corrector, current) is not False:
-                    return True
-                print(f"{corrector}: readback timeout ({attempt}/{attempts})")
-            return False
+        def set_corrector(corrector, current):  # the interface retries until the readback confirms the setpoint
+            return I.set_correctors(corrector, current) is not False
 
-        for iter in range(self.Niter):
+        for it in range(self.Niter):
             if not self.running: break
             if self.paused:      self._await_user()
 
@@ -145,100 +139,53 @@ class Worker(QObject):
                 if self.paused:      self._await_user()
 
                 if corrector in self.hcorrs:
-                    kick=float(hkicks[icorr])
-                    target = float(self.max_osc_h)
-                    max_curr = float(self.max_curr_h)
-                    response_plane = "x"
+                    kick, target, max_curr, response_plane = float(hkicks[icorr]), float(self.max_osc_h), float(self.max_curr_h), "x"
                 elif corrector in self.vcorrs:
-                    kick=float(vkicks[icorr])
-                    target = float(self.max_osc_v)
-                    max_curr = float(self.max_curr_v)
-                    response_plane = "y"
+                    kick, target, max_curr, response_plane = float(vkicks[icorr]), float(self.max_osc_v), float(self.max_curr_v), "y"
                 else:
                     print(f"Corrector {corrector} not in h/v correctors")
                     continue
 
-                if not self.running: break
-                if self.paused:      self._await_user()
-
-                corr_changed = False
-
-                filename_p=os.path.join(self.output_dir, f'DATA_{corrector}_p{iter:04d}.pkl')
-                filename_m=os.path.join(self.output_dir, f'DATA_{corrector}_m{iter:04d}.pkl')
-
-                corr_fully_measured=os.path.isfile(filename_p) and os.path.isfile(filename_m)
-                measured_this_corr=False
-
-                if not corr_fully_measured:
-                    print(f"Corrector {corrector} '+' excitation...")
-                if not os.path.isfile(filename_p):
-                    print('corr[bds] =', corr['bdes'], ' also kick = ', kick)
-                    curr_p = corr['bdes'] + kick
-                    curr_p = clamp(curr_p, max_curr)
-                    if not set_corrector_with_retry(corrector, curr_p):
-                        print(f"Skipping {corrector}: '+' readback failed after retries")
-                        if not set_corrector_with_retry(corrector, corr['bdes']):
-                            print(f"Stopping SysID: {corrector} did not return to its initial current")
-                            self.running = False
-                            break
+                fully_measured = measured(corrector, it)
+                corr_changed = measured_this_corr = skipped = False
+                orbits = {}
+                for sign, tag in ((1, "p"), (-1, "m")):
+                    filename = data_file(corrector, tag, it)
+                    label = "+" if sign > 0 else "-"
+                    if not fully_measured:
+                        print(f"Corrector {corrector} '{label}' excitation...")
+                    if os.path.isfile(filename):
+                        orbits[tag] = self.state_class(filename=filename).get_orbit(self.bpms)
                         continue
-                    corr_changed = True
-                    if not self.running: break
-                    if self.paused:      self._await_user()
-                    measured_this_corr=True
-                    state_p=I.get_state()
-                    state_p.save(filename=filename_p)
-                else:
-                    state_p=self.state_class(filename=filename_p)
-                Op = state_p.get_orbit(self.bpms)
-                if not corr_fully_measured:
-                    print(f"Corrector {corrector} '-' excitation...")
-                if not os.path.isfile(filename_m):
-                    curr_m = corr['bdes'] - kick
-                    curr_m = clamp(curr_m, max_curr)
-                    if not set_corrector_with_retry(corrector, curr_m):
-                        print(f"Skipping {corrector}: '-' readback failed after retries")
-                        if not set_corrector_with_retry(corrector, corr['bdes']):
-                            print(f"Stopping SysID: {corrector} did not return to its initial current")
-                            self.running = False
-                            break
-                        continue
-                    corr_changed = True
-
-                    if not self.running: break
-                    if self.paused:      self._await_user()
-                    measured_this_corr=True
-
-                    state_m=I.get_state()
-                    state_m.save(filename=filename_m)
-                else:
-                    state_m=self.state_class(filename=filename_m)
-                Om = state_m.get_orbit(self.bpms)
-
-                if corr_changed:
-                    if not set_corrector_with_retry(corrector, corr['bdes']):
-                        print(f"Stopping SysID: {corrector} did not return to its initial current")
-                        self.running = False
+                    if not set_corrector(corrector, clamp(corr['bdes'] + sign * kick, max_curr)):
+                        print(f"Skipping {corrector}: '{label}' readback failed after retries")
+                        skipped = True
                         break
+                    corr_changed = True
+                    if not self.running: break
+                    if self.paused:      self._await_user()
+                    measured_this_corr = True
+                    state = I.get_state()
+                    state.save(filename=filename)
+                    orbits[tag] = state.get_orbit(self.bpms)
 
+                if (corr_changed or skipped) and not set_corrector(corrector, corr['bdes']):
+                    print(f"Stopping SysID: {corrector} did not return to its initial current")
+                    self.running = False
                 if not self.running: break
+                if skipped: continue
                 if self.paused:      self._await_user()
 
+                Op, Om = orbits["p"], orbits["m"]
                 Diff_x = (Op['x'] - Om['x']) / 2.0
                 Diff_y = (Op['y'] - Om['y']) / 2.0
-
-                print("last bpms:", self.bpms[-10:])
-                print("last Diff_x:", Diff_x[-10:])
-                print("last Diff_y:", Diff_y[-10:])
-
                 nsamples = max(1, int(np.asarray(Op['stdx']).size))
                 Err_x = np.sqrt(np.square(Op['stdx']) + np.square(Om['stdx'])) / np.sqrt(nsamples)
                 Err_y = np.sqrt(np.square(Op['stdy']) + np.square(Om['stdy'])) / np.sqrt(nsamples)
                 if measured_this_corr:
                     self.plot_data.emit(Diff_x, Err_x, Diff_y, Err_y, self.bpms, corrector)
-                    self.progress_value=self.progress_value + 1
-                    percent = int(self.progress_value / total_steps * 100)
-                    self.progress.emit(percent)
+                    self.progress_value = self.progress_value + 1
+                    self.progress.emit(int(self.progress_value / total_steps * 100))
 
                 observed = finite_abs_max(Diff_x if response_plane == "x" else Diff_y)
                 new_kick = update_amplitude(kick, observed, target, max_curr)
@@ -247,12 +194,12 @@ class Worker(QObject):
                     hkicks[icorr] = new_kick
                 else:
                     vkicks[icorr] = new_kick
-                with open(os.path.join(self.output_dir,'kicks.txt'), 'w') as f:
+                with open(os.path.join(self.output_dir, 'kicks.txt'), 'w') as f:
                     for i, c in enumerate(self.correctors):
                         f.write(f'{c} {hkicks[i]} {vkicks[i]}\n')
                 if measured_this_corr:
-                    t0=time.monotonic() #saves current time, but not a system time, it's for measuring time difference
-                    while self.running and (time.monotonic() -t0) <1:
+                    t0 = time.monotonic()  # saves current time, but not a system time, it's for measuring time difference
+                    while self.running and (time.monotonic() - t0) < 1:
                         time.sleep(0.05)
 
         self.running = False
@@ -322,7 +269,6 @@ class MainWindow(QMainWindow, SaveOrLoad):
         # SysID
         self.worker = None
         self.thread = None
-        self._activate_mode=None
         self.stop_requested = False
         self.cwd = os.getcwd()
         self.interface = interface
@@ -395,7 +341,6 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.state_class = interface.get_state().__class__
         self.working_directory_dialog.clicked.connect(self._pick_and_load_data_dir)
         self.__set_status_in_title("[Idle]")
-        interface_name=interface.get_name()
         self.modes_to_do=[]
         self.counter=0
         self.current_mode=None
@@ -407,14 +352,11 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self._set_directory_edit_enabled(True)
         self._refresh_actuator_list()
         self._refresh_actuator_labels()
-        self.hcorrector_names = set(map(str, self.interface.get_hcorrectors_names() or [])) # takes correctors names, if None, then use an empty list, makes everything a string and saves as a set without the duplicates
-        self.vcorrector_names = set(map(str, self.interface.get_vcorrectors_names() or []))
         self.pattern_corrs_input.setPlaceholderText("e.g. ZH*, ZV*, IP*")
         self.pattern_corrs_input.textChanged.connect(self.pattern_matching)
         self.sysid_plot_popup = None
         self._last_plot_data = None
         self.method = self.beam_change_method_combo.currentData()
-        print(self.method)
 
     def _setup_nsamples_control(self):
         self.nsamples_input.setText(str(max(1, int(self.interface.nsamples))))
@@ -540,11 +482,6 @@ class MainWindow(QMainWindow, SaveOrLoad):
         self.sysid_plot_popup.show()
         self.sysid_plot_popup.raise_()
         self.sysid_plot_popup.activateWindow()
-
-    def _is_h_corrector(self, s):
-        return str(s) in self.hcorrector_names
-    def _is_v_corrector(self, s):
-        return str(s) in self.vcorrector_names
 
     def pattern_matching(self, pattern):
         pattern_wanted = self.pattern_corrs_input.text().strip()
@@ -843,116 +780,66 @@ class MainWindow(QMainWindow, SaveOrLoad):
             for machine_status in missing_machine_status:
                 machine_state.save(filename=machine_status)
 
-        self.counter=0
-        self._start_next_mode()
+        self.counter = 0
+        self._selection = (selected_correctors, selected_bpms)
+        if not self._launch_worker(*self._selection):
+            self._set_directory_edit_enabled(True)
 
-        # kicks = 0.1 * np.ones(len(selected_correctors), dtype=float)
+    def _launch_worker(self, correctors, bpms):
         try:
             initial_hkick = float(self.initial_hkick_settings.text())
             initial_vkick = float(self.initial_vkick_settings.text())
         except ValueError:
             QMessageBox.critical(self, "Invalid initial excitation", "Initial hkick/X and vkick/Y must be numbers.")
-            self._set_directory_edit_enabled(True)
-            return
-        hkicks = initial_hkick * np.ones(len(selected_correctors), dtype=float)
-        vkicks = initial_vkick * np.ones(len(selected_correctors), dtype=float)
-
-        max_osc_h = self.horizontal_excursion_spinbox.value()
-        max_osc_v = self.vertical_excursion_spinbox.value()
-        max_curr_h = self.max_horizontal_current_spinbox.value()
-        max_curr_v = self.max_vertical_current_spinbox.value()
+            return False
         try:
             Niter = int(self.niter_number.text())
         except ValueError:
             QMessageBox.critical(self, "Invalid number of iterations", "Niter must be an integer.")
-            self._set_directory_edit_enabled(True)
-            return
+            return False
         print(f"Niter: {Niter}")
-
+        self._start_next_mode()
+        n = len(correctors)
         self.thread = QThread()
-        out_dir=self.mode_dirs[self.current_mode]
-        self.worker = self.WORKER_CLASS(self.interface, None, selected_correctors, selected_bpms, hkicks, vkicks, max_osc_h, max_osc_v, max_curr_h, max_curr_v, Niter, out_dir, self.actuator_mode, state_class=self.state_class)
+        self.worker = self.WORKER_CLASS(self.interface, None, correctors, bpms, initial_hkick * np.ones(n), initial_vkick * np.ones(n),
+                                        self.horizontal_excursion_spinbox.value(), self.vertical_excursion_spinbox.value(),
+                                        self.max_horizontal_current_spinbox.value(), self.max_vertical_current_spinbox.value(),
+                                        Niter, self.mode_dirs[self.current_mode], self.actuator_mode, state_class=self.state_class)
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
         self.worker.finished.connect(self.thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
         self.worker.error.connect(self._on_worker_error)
         self.thread.finished.connect(self.thread.deleteLater)
-
-        # Cleanup after thread is done
-        def clear_thread():
-            try:
-                if self.current_mode==Mode.Orbit:
-                    print("Orbit mode active.")
-                elif self.current_mode==Mode.Dispersion:
-                    self.interface.reset_energy(method=self.method)
-                elif self.current_mode==Mode.Wakefield:
-                    self.interface.reset_intensity()
-            except Exception as e:
-                print(e)
-                QMessageBox.warning(self, "Warning",f"Could not confirm the machine returned to its nominal state.")
-            print("Restoring initial correctors' settings...")
-            #self.S.load('machine_status')
-            current_dir=self.mode_dirs[self.current_mode]
-            machine_state=self.state_class(filename=os.path.join(current_dir,"machine_status.pkl"))
-            if self._restore_actuators_state(machine_state) is False:
-                QMessageBox.warning(
-                    self, "SysID restore",
-                    "Not every corrector was set back at its saved current after this mode. Check the correctors on the machine.")
-            self.progressBar.setValue(100)
-            self.thread = None
-            self.worker = None
-            self.counter+=1
-            if self.stop_requested:
-                self._set_directory_edit_enabled(True)
-                self.__set_status_in_title("[Idle]")
-                return
-            if self.counter< len(self.modes_to_do):
-                self._start_next_mode()
-                try:
-                    initial_hkick = float(self.initial_hkick_settings.text())
-                    initial_vkick = float(self.initial_vkick_settings.text())
-                except ValueError:
-                    QMessageBox.critical(self, "Invalid initial excitation", "Initial hkick/X and vkick/Y must be numbers.")
-                    self._set_directory_edit_enabled(True)
-                    self.__set_status_in_title("[Idle]")
-                    return
-                hkicks = initial_hkick * np.ones(len(selected_correctors), dtype=float)
-                vkicks = initial_vkick * np.ones(len(selected_correctors), dtype=float)
-                max_osc_h = self.horizontal_excursion_spinbox.value()
-                max_osc_v = self.vertical_excursion_spinbox.value()
-                max_curr_h = self.max_horizontal_current_spinbox.value()
-                max_curr_v = self.max_vertical_current_spinbox.value()
-                try:
-                    Niter = int(self.niter_number.text())
-                except ValueError:
-                    QMessageBox.critical(self, "Invalid number of iterations", "Niter must be an integer.")
-                    self._set_directory_edit_enabled(True)
-                    self.__set_status_in_title("[Idle]")
-                    return
-                print(f"Niter: {Niter}")
-                self.thread = QThread()
-                out_dir = self.mode_dirs[self.current_mode]
-                self.worker = self.WORKER_CLASS(self.interface, None, selected_correctors, selected_bpms, hkicks, vkicks, max_osc_h, max_osc_v, max_curr_h, max_curr_v, Niter, out_dir, self.actuator_mode, state_class=self.state_class)
-                self.worker.moveToThread(self.thread)
-                self.thread.started.connect(self.worker.run)
-                self.worker.finished.connect(self.thread.quit)
-                self.worker.finished.connect(self.worker.deleteLater)
-                self.worker.error.connect(self._on_worker_error)
-                self.thread.finished.connect(self.thread.deleteLater)
-                self.thread.finished.connect(clear_thread)
-                self.worker.plot_data.connect(self.__update_plot)
-                self.worker.progress.connect(self._update_progress)
-                self.thread.start()
-            else:
-                self._set_directory_edit_enabled(True)
-                self.__set_status_in_title("[Idle]")
-
-        self.thread.finished.connect(clear_thread)
+        self.thread.finished.connect(self._on_mode_finished)
         self.worker.plot_data.connect(self.__update_plot)
         self.worker.progress.connect(self._update_progress)
-
         self.thread.start()
+        return True
+
+    def _on_mode_finished(self):
+        # restores the nominal beam and correctors, then runs the next mode (if any)
+        try:
+            if self.current_mode == Mode.Dispersion:
+                self.interface.reset_energy(method=self.method)
+            elif self.current_mode == Mode.Wakefield:
+                self.interface.reset_intensity()
+        except Exception as e:
+            print(e)
+            QMessageBox.warning(self, "Warning", "Could not confirm the machine returned to its nominal state.")
+        print("Restoring initial correctors' settings...")
+        machine_state = self.state_class(filename=os.path.join(self.mode_dirs[self.current_mode], "machine_status.pkl"))
+        if self._restore_actuators_state(machine_state) is False:
+            QMessageBox.warning(
+                self, "SysID restore",
+                "Not every corrector was set back at its saved current after this mode. Check the correctors on the machine.")
+        self.progressBar.setValue(100)
+        self.thread = None
+        self.worker = None
+        self.counter += 1
+        if self.stop_requested or self.counter >= len(self.modes_to_do) or not self._launch_worker(*self._selection):
+            self._set_directory_edit_enabled(True)
+            self.__set_status_in_title("[Idle]")
 
     def __stop_button_clicked(self):
         self.stop_requested = True
