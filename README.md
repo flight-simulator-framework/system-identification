@@ -60,6 +60,4 @@ pip install rf-track cpymad
 pip install --no-deps -e machine-interfaces/backends/clear
 ```
 
-Editable installs pick up `git pull` changes without reinstalling.
-
 For quadrupole-mover measurements, run `python SysID_QM_GUI.py`. For the real ESRF machine, set `TANGO_HOST` before starting the GUI.
