@@ -172,7 +172,7 @@ class MainWindow(CorrectorSysIDWindow):
     def __init__(self, interface, dir_name):
         self.qm_corrs = [str(name) for name in interface.get_quadrupole_movers_names()]
         super().__init__(interface, dir_name)
-        self.setWindowTitle(f"SYSID QM - {self.interface.__class__.__name__} [Idle]")
+        self.setWindowTitle(f"SYSID QM - {self.interface.get_name()} [Idle]")
         self.save_correctors_button.setText("Save quadrupoles")
         self.load_correctors_button.setText("Load quadrupoles")
         self.clear_correctors_button.setText("Clear quadrupoles")

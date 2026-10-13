@@ -228,7 +228,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
     WORKER_CLASS = Worker
 
     def __set_status_in_title(self, status):
-        self.setWindowTitle(self._window_title_prefix() + " - " + self.interface.__class__.__name__ + " " + status)
+        self.setWindowTitle(self._window_title_prefix() + " - " + self.interface.get_name() + " " + status)
 
     def _window_title_prefix(self):
         return "SYSID"
