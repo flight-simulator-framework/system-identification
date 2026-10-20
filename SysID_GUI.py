@@ -615,6 +615,7 @@ class MainWindow(QMainWindow, SaveOrLoad):
             QMessageBox.warning(
                 self, "SysID restore",
                 f"Not every corrector was set back at its saved current before the {self._mode_label(mode)} measurement. Check the correctors on the machine.")
+        self.interface.switch_off_sextupoles()
 
         if mode==Mode.Orbit:
             #self.interface.reset_intensity()
@@ -827,6 +828,8 @@ class MainWindow(QMainWindow, SaveOrLoad):
         except Exception as e:
             print(e)
             QMessageBox.warning(self, "Warning", "Could not confirm the machine returned to its nominal state.")
+        finally:
+            self.interface.reset_sextupoles()
         print("Restoring initial correctors' settings...")
         machine_state = self.state_class(filename=os.path.join(self.mode_dirs[self.current_mode], "machine_status.pkl"))
         if self._restore_actuators_state(machine_state) is False:
